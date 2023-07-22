@@ -16,4 +16,6 @@ public class AddCenterRequestDTO {
 
     CenterType centerType;
 
+    String address;
+
 }

@@ -33,15 +33,13 @@ public class DoseController {
     JavaMailSender javaMailSender;
 
 
-    @PostMapping("/get_dose1")
+    @PostMapping("/get_doseOne")
     public ResponseEntity getDose1(@RequestBody BookDoseRequestDTO bookDose1){
         String email = bookDose1.getEmail();
         DoseName doseName = bookDose1.getDoseName();
 
         try{
             BookDoseResponseDTO responseDTO = doseService.getDose1(email, doseName);
-            // create a certificate
-            Certificate certificate = certificateController.create_certificate(email);
 
             Person person = personService.get_person(email);
 
@@ -49,8 +47,9 @@ public class DoseController {
             message.setFrom("bookingvaccine3@gmail.com");
             message.setTo(person.getEmail());
             message.setSubject("Dose 1 Taken!");
-            message.setText("Hello "+person.getName()+". You have taken the Dose 1, And your certificate is generated " +
-                    "with id "+certificate.getCertificateNo());
+            message.setText("Hello "+person.getName()+". You have taken the Dose 1, After 15 days get your Dose 2 "
+                    +"And your certificate will be issued.");
+
             javaMailSender.send(message);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
@@ -63,34 +62,7 @@ public class DoseController {
         }
     }
 
-    // lets not ask for different dose but same dose will be give.
-    @PostMapping("/get_dose2")
-    public ResponseEntity getDose2(@RequestParam("email") String email){
-        try{
-           GetDoseListResponseDTO responseDTO1 = personService.doseTakenAlready(email);
+    // get done 2
 
-           List<DoseName> doses = responseDTO1.getDoses();
 
-           if(doses.size()==2){
-               return new ResponseEntity("Dose 2 already Taken", HttpStatus.BAD_REQUEST);
-           }
-
-           Person person = personService.get_person(email);
-
-           long personId = person.getId();
-           DoseName doseName = doses.get(0);
-
-           BookDoseResponseDTO responseDTO = doseService.getDose2(personId, doseName);
-
-           certificateController.secondDoseTaken(personId);
-
-           return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-        }catch (PersonNotFoundException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (DoseAlreadyTaken e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            return new ResponseEntity<>("Server Error.", HttpStatus.BAD_REQUEST);
-        }
-    }
 }

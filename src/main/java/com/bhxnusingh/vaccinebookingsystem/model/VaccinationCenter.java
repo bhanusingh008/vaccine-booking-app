@@ -25,9 +25,14 @@ public class VaccinationCenter {
 
     String centerName;
 
+    String address;
+
     @Enumerated(EnumType.STRING)
     CenterType centerType;
 
-    @OneToMany
+    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL)
     List<Doctor> doctorList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL)
+    List<Appointment> appointmentList = new ArrayList<>();
 }

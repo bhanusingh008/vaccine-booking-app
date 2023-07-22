@@ -2,6 +2,7 @@ package com.bhxnusingh.vaccinebookingsystem.DTO.RequestDTO;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 
@@ -10,10 +11,13 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddAppointmentRequestDTO {
-    long personId;
+public class AppointmentRequestDTO {
+    String personEmail;
 
-    long doctorId;
+    String doctorEmail;
 
+    long centerId;
+
+    @CreationTimestamp
     Date date;
 }

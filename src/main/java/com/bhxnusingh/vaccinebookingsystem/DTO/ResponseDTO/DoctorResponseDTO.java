@@ -8,7 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddDoctorResponseDTO {
+@Builder
+public class DoctorResponseDTO {
     String name;
-    long id;
+    String email;
 }

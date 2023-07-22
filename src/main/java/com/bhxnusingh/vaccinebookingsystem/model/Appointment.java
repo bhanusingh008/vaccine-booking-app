@@ -27,6 +27,9 @@ public class Appointment {
     Date appointmentDate;
 
     @ManyToOne
+    VaccinationCenter center;
+
+    @ManyToOne
     @JoinColumn
     Person person;
 

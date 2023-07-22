@@ -9,11 +9,14 @@ import com.bhxnusingh.vaccinebookingsystem.exception.PersonNotFoundException;
 import com.bhxnusingh.vaccinebookingsystem.model.Dose;
 import com.bhxnusingh.vaccinebookingsystem.model.Person;
 import com.bhxnusingh.vaccinebookingsystem.repository.PersonRepository;
+import com.bhxnusingh.vaccinebookingsystem.tranformer.PersonTransformer;
+import nonapi.io.github.classgraph.utils.VersionFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -21,63 +24,35 @@ public class PersonService {
     @Autowired
     PersonRepository personRepository;
 
+    public Person get_person(String email){
+        Optional<Person> optionalPerson =personRepository.findByEmail(email);
+
+        if(optionalPerson.isEmpty()) throw new PersonNotFoundException("Email not registered.");
+
+        return optionalPerson.get();
+    }
+
     public AddPersonResponseDTO add_person(AddPersonRequestDTO requestDTO) {
         // create the person.
 
-        Person person = new Person();
-        person.setName(requestDTO.getName());
-        person.setAge(requestDTO.getAge());
-        person.setEmail(requestDTO.getEmail());
-        person.setPhone(requestDTO.getPhone());
-        person.setGender(requestDTO.getGender());
+        Person person = PersonTransformer.personFromAddPersonRequestDTO(requestDTO);
 
         Person added_person = personRepository.save(person);
 
-        AddPersonResponseDTO responseDTO = new AddPersonResponseDTO();
-        responseDTO.setId(added_person.getId());
-        responseDTO.setName(added_person.getName());
-        responseDTO.setEmail(added_person.getEmail());
-        responseDTO.setPhone(added_person.getPhone());
-
-        return responseDTO;
-    }
-
-    public GetDoseListResponseDTO doseTakenAlready(String email) {
-        Person person = personRepository.findByEmail(email);
-
-        if(person==null){
-            throw new PersonNotFoundException("Email does not exist.");
-        }
-
-        GetDoseListResponseDTO responseDTO = new GetDoseListResponseDTO();
-        responseDTO.setEmail(email);
-        List<Dose> list = person.getDosesTaken();
-
-        List<DoseName> newList = new ArrayList<>();
-
-        for(int i = 0; i < list.size(); i++){
-            newList.add(list.get(i).getDoseName());
-        }
-
-        responseDTO.setDoses(newList);
-
-        return responseDTO;
-    }
-
-    public Person get_person(String email){
-        return personRepository.findByEmail(email);
+        return PersonTransformer.AddPersonResponseDTOFromPerson(added_person);
     }
 
 
     public Person updateEmail(String oldEmail, String newEmail) {
-        Person person = personRepository.findByEmail(oldEmail);
 
-        if(person==null){
+        Optional<Person> optionalPerson = personRepository.findByEmail(oldEmail);
+
+        if(optionalPerson.isEmpty()) {
             throw new PersonNotFoundException("Email does not exist.");
         }
 
-        person.setEmail(newEmail);
+        optionalPerson.get().setEmail(newEmail);
 
-        return personRepository.save(person);
+        return personRepository.save(optionalPerson.get());
     }
 }

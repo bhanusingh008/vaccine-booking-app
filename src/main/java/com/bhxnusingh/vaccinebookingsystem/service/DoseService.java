@@ -19,7 +19,7 @@ public class DoseService {
     PersonRepository personRepository;
 
     public BookDoseResponseDTO getDose1(String email, DoseName doseName){
-        Optional<Person> optionalPerson = Optional.ofNullable(personRepository.findByEmail(email));
+        Optional<Person> optionalPerson = personRepository.findByEmail(email);
 
         if(optionalPerson.isEmpty()){
             throw new PersonNotFoundException("Invalid Email.");

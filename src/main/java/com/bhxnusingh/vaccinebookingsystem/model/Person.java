@@ -37,6 +37,9 @@ public class Person {
 
     boolean doseTwoTaken;
 
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    List<Appointment> appointmentList = new ArrayList<>();
+
     @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
     List<Dose> dosesTaken = new ArrayList<>();
 

@@ -3,20 +3,17 @@ package com.bhxnusingh.vaccinebookingsystem.DTO.ResponseDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
-public class AddAppointmentResponseDTO {
-    String appointmentId;
+public class CertificateResponseDTO {
 
-    Date date;
+    String certificateNo;
 
-    String personName;
+    String confirmationMessage;
 
-    String doctorName;
+    String personEmail;
 }

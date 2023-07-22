@@ -1,36 +1,41 @@
 package com.bhxnusingh.vaccinebookingsystem.service;
 
+import com.bhxnusingh.vaccinebookingsystem.DTO.ResponseDTO.CertificateResponseDTO;
+import com.bhxnusingh.vaccinebookingsystem.exception.PersonNotFoundException;
 import com.bhxnusingh.vaccinebookingsystem.model.Certificate;
 import com.bhxnusingh.vaccinebookingsystem.model.Person;
 import com.bhxnusingh.vaccinebookingsystem.repository.CertificateRepository;
 import com.bhxnusingh.vaccinebookingsystem.repository.PersonRepository;
+import com.bhxnusingh.vaccinebookingsystem.tranformer.CertificateTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class CertificateService {
     @Autowired
     CertificateRepository certificateRepository;
-
     @Autowired
     PersonRepository personRepository;
-    public Certificate create_certificate(String email) {
-        Certificate certificate = new Certificate();
-        certificate.setCertificateNo(UUID.randomUUID().toString());
-        certificate.setPerson(personRepository.findByEmail(email));
-        certificate.setConfirmationMessage("Certification of Dose 1 Completion");
-        certificate.setDoseTaken(1);
+    public CertificateResponseDTO create_certificate(String email) {
+        Optional<Person> optionalPerson = personRepository.findByEmail(email);
 
-        return certificateRepository.save(certificate);
-    }
+        if (optionalPerson.isEmpty()){
+            throw new PersonNotFoundException("Person not found.");
+        }
 
-    public Certificate secondDoseTaken(long personId) {
-        Person curr_person = personRepository.getReferenceById(personId);
-        Certificate certificate = curr_person.getCertificate();
-        certificate.setDoseTaken(2);
-        certificate.setConfirmationMessage("Certification of Dose 2 Completion");
+        if(!optionalPerson.get().isDoseTwoTaken()){
+            throw new RuntimeException("Dose Two Not Taken");
+        }
 
-        return certificateRepository.save(certificate);
+        Certificate certificate = CertificateTransformer.certificateResponseDTOtoCertificate(email);
+
+        certificate.setPerson(optionalPerson.get());
+
+        Certificate saved_certificate = certificateRepository.save(certificate);
+
+        return CertificateTransformer.certificateToCertificateResponseDTO(saved_certificate);
     }
 }
